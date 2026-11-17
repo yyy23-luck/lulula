@@ -1,0 +1,14 @@
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';
+const out=path.join(import.meta.dirname,'public');
+const home=fs.readFileSync(path.join(out,'index.html'),'utf8');
+assert(!home.includes('[[01-课程'),'Home table links must render');
+const index=JSON.parse(fs.readFileSync(path.join(out,'static/contentIndex.json'),'utf8'));
+assert(Object.keys(index).length>=11);
+assert(!Object.keys(index).some(k=>/90-模板|00-收集箱|private/.test(k)));
+const page=fs.readFileSync(path.join(out,'01-课程/应用回归分析/自相关性.html'),'utf8');
+assert(page.includes('katex'),'Math must be rendered');
+assert(page.includes('mermaid'),'Mermaid diagram must be emitted');
+assert(page.includes('autocorrelation-patterns.png'));
+assert(fs.existsSync(path.join(out,'static/katex/fonts/KaTeX_Main-Regular.woff2')));
+assert(!fs.existsSync(path.join(out,'CNAME')),'GitHub project URL must not create a custom CNAME');
+console.log(JSON.stringify({homeLinks:'pass',indexedPages:Object.keys(index).length,privateExclusion:'pass',math:'pass',diagramMarkup:'pass',localFonts:'pass',projectUrl:'pass'},null,2));
